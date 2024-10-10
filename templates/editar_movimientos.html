@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Movimiento{% endblock %}
+
+{% block content %}
+<h2>Editar Movimiento</h2>
+
+
+<form method="POST" action="/movimientos/editar/{{ movimiento[0] }}">
+    <div class="mb-3">
+        <p>ID del Movimiento: {{ movimiento[0] }}</p>
+        <label for="id_producto" class="form-label">Producto</label>
+        <select class="form-select" id="id_producto" name="id_producto" required>
+            {% for producto in productos %}
+                <option value="{{ producto[0] }}" {% if producto[0] == movimiento[1] %}selected{% endif %}>
+                    {{ producto[1] }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="tipo_movimiento" class="form-label">Tipo de Movimiento</label>
+        <select class="form-select" id="tipo_movimiento" name="tipo_movimiento" required>
+            <option value="1" {% if movimiento[2] == 1 %}selected{% endif %}>Entrada</option>
+            <option value="0" {% if movimiento[2] == 0 %}selected{% endif %}>Salida</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="cantidad" class="form-label">Cantidad</label>
+        <input type="number" class="form-control" id="cantidad" name="cantidad" value="{{ movimiento[3] }}" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+    <a href="/movimientos" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

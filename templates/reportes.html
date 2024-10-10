@@ -1,0 +1,202 @@
+{% extends "dashboard.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4">Reportes de Productos</h1>
+    
+    <form id="searchForm">
+        <div class="form-group">
+            <label for="searchInput">Buscar Producto:</label>
+            <input type="text" class="form-control" id="searchInput" placeholder="Nombre o ID del producto">
+        </div>
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+
+    <h2 class="mt-4">Resultados de la Búsqueda</h2>
+    <table class="table table-striped" id="resultsTable">
+        <thead>
+            <tr>
+                <th>ID Producto</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Stock</th>
+            </tr>
+        </thead>
+        <tbody id="resultsBody">
+            <!-- Aquí se llenarán los resultados de productos -->
+        </tbody>
+    </table>
+
+    <h2 class="mt-4">Movimientos del Producto</h2>
+    <table class="table table-striped" id="movimientosTable">
+        <thead>
+            <tr>
+                <th>ID Movimiento</th>
+                <th>ID Producto</th>
+                <th>Usuario</th>
+                <th>Tipo de Movimiento</th>
+                <th>Cantidad</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody id="movimientosBody">
+            <!-- Aquí se llenarán los movimientos relacionados -->
+        </tbody>
+    </table>
+
+    <!-- Botones de exportación de productos -->
+    <div class="mt-4">
+        <h3>Exportar Productos</h3>
+        <button class="btn btn-primary" id="exportCSV">Exportar Productos a CSV</button>
+        <button class="btn btn-success" id="exportXLSX">Exportar Productos a XLSX</button>
+        <button class="btn btn-danger" id="exportPDF">Exportar Productos a PDF</button>
+        <button class="btn btn-info" id="exportJSON">Exportar Productos a JSON</button>
+        <button class="btn btn-secondary" id="exportXML">Exportar Productos a XML</button>
+    </div>
+
+    <!-- Botones de exportación de movimientos -->
+    <div class="mt-4">
+        <h3>Exportar Movimientos</h3>
+        <button class="btn btn-primary" id="exportMovimientosCSV">Exportar Movimientos a CSV</button>
+        <button class="btn btn-success" id="exportMovimientosXLSX">Exportar Movimientos a XLSX</button>
+        <button class="btn btn-danger" id="exportMovimientosPDF">Exportar Movimientos a PDF</button>
+        <button class="btn btn-info" id="exportMovimientosJSON">Exportar Movimientos a JSON</button>
+        <button class="btn btn-secondary" id="exportMovimientosXML">Exportar Movimientos a XML</button>
+    </div>
+</div>
+
+<script>
+// Al hacer la búsqueda de productos
+document.getElementById("searchForm").onsubmit = async function(e) {
+    e.preventDefault();
+    const searchTerm = document.getElementById("searchInput").value;
+
+    try {
+        // Llamar a la API para buscar productos
+        const response = await fetch(`/buscar_productos?term=${searchTerm}`);
+        const productos = await response.json();
+
+        // Actualizar la tabla con los resultados de productos
+        const resultsBody = document.getElementById("resultsBody");
+        resultsBody.innerHTML = ""; // Limpiar la tabla antes de insertar nuevos resultados
+
+        productos.forEach(producto => {
+            resultsBody.innerHTML += `
+                <tr data-id="${producto.id}">
+                    <td>${producto.id}</td>
+                    <td>${producto.nombre}</td>
+                    <td>${producto.descripcion}</td>
+                    <td>${producto.precio.toFixed(2)} $</td>
+                    <td>${producto.stock}</td>
+                </tr>
+            `;
+        });
+
+        // Limpiar los movimientos previos al realizar una nueva búsqueda
+        const movimientosBody = document.getElementById("movimientosBody");
+        movimientosBody.innerHTML = "";
+
+        // Cargar movimientos si se encontró el producto
+        if (productos.length > 0) {
+            const productoId = productos[0].id; // Seleccionamos el primer producto encontrado
+            await cargarMovimientos(productoId); // Cargar movimientos para el primer producto
+        }
+    } catch (error) {
+        console.error("Error al buscar productos:", error);
+    }
+};
+
+// Cargar los movimientos de un producto
+async function cargarMovimientos(productoId) {
+    try {
+        const response = await fetch(`/movimientos_producto?id=${productoId}`);
+        const movimientos = await response.json();
+
+        // Actualizar la tabla de movimientos
+        const movimientosBody = document.getElementById("movimientosBody");
+        movimientosBody.innerHTML = ""; // Limpiar movimientos anteriores
+
+        movimientos.forEach(movimiento => {
+            movimientosBody.innerHTML += `
+                <tr>
+                    <td>${movimiento.id}</td>
+                    <td>${movimiento.id_producto}</td>
+                    <td>${movimiento.usuario}</td>
+                    <td>${movimiento.tipo_movimiento}</td>
+                    <td>${movimiento.cantidad}</td>
+                    <td>${new Date(movimiento.fecha).toLocaleString()}</td>
+                </tr>
+            `;
+        });
+    } catch (error) {
+        console.error("Error al cargar movimientos:", error);
+    }
+}
+</script>
+
+<script>
+    // Exportar Productos
+    document.getElementById("exportCSV").onclick = function() {
+        const term = document.getElementById("searchInput").value;
+        window.location.href = `/export/csv?term=${term}`;
+    };
+    
+    document.getElementById("exportXLSX").onclick = function() {
+        const term = document.getElementById("searchInput").value;
+        window.location.href = `/export/xlsx?term=${term}`;
+    };
+
+    document.getElementById("exportPDF").onclick = function() {
+        const term = document.getElementById("searchInput").value;
+        window.location.href = `/export/pdf?term=${term}`;
+    };
+
+    document.getElementById("exportJSON").onclick = function() {
+        const term = document.getElementById("searchInput").value;
+        window.location.href = `/export/json?term=${term}`;
+    };
+
+    document.getElementById("exportXML").onclick = function() {
+        const term = document.getElementById("searchInput").value;
+        window.location.href = `/export/xml?term=${term}`;
+    };
+
+    // Exportar Movimientos
+    document.getElementById("exportMovimientosCSV").onclick = function() {
+        const term2 = Array.from(document.querySelectorAll("#movimientosBody tr"))
+            .map(row => row.cells[0].textContent)
+            .join(",");
+        window.location.href = `/exportar/movimientos/csv?term=${term2}`;
+    };
+    
+    document.getElementById("exportMovimientosXLSX").onclick = function() {
+        const term2 = Array.from(document.querySelectorAll("#movimientosBody tr"))
+            .map(row => row.cells[0].textContent)
+            .join(",");
+        window.location.href = `/exportar/movimientos/xlsx?term=${term2}`;
+    };
+
+    document.getElementById("exportMovimientosPDF").onclick = function() {
+        const term2 = Array.from(document.querySelectorAll("#movimientosBody tr"))
+            .map(row => row.cells[0].textContent)
+            .join(",");
+            window.location.href = `/exportar/movimientos/pdf?term=${term2}`;
+    };
+
+    document.getElementById("exportMovimientosJSON").onclick = function() {
+        const term2 = Array.from(document.querySelectorAll("#movimientosBody tr"))
+            .map(row => row.cells[0].textContent)
+            .join(",");
+        window.location.href = `/exportar/movimientos/json?term=${term2}`;
+    };
+
+    document.getElementById("exportMovimientosXML").onclick = function() {
+        const term2 = Array.from(document.querySelectorAll("#movimientosBody tr"))
+            .map(row => row.cells[0].textContent)
+            .join(",");
+        window.location.href = `/exportar/movimientos/xml?term=${term2}`;
+    };
+</script>
+
+{% endblock %}

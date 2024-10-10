@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Agregar Movimiento{% endblock %}
+
+{% block content %}
+<h2>Agregar Movimiento</h2>
+<form method="POST" action="/movimientos/agregar">
+    <div class="mb-3">
+        <label for="id_producto" class="form-label">Seleccione un Producto</label>
+        <select class="form-select" id="id_producto" name="id_producto" required>
+            <option value="">Seleccione un producto</option>
+            {% for producto in productos %}
+                <option value="{{ producto[0] }}">{{ producto[1] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="id_usuario" class="form-label">Seleccione un Usuario</label>
+        <select class="form-select" id="id_usuario" name="id_usuario" required>
+            <option value="">Seleccione un usuario</option>
+            {% for usuario in usuarios %}
+                <option value="{{ usuario[0] }}">{{ usuario[1] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="tipo_movimiento" class="form-label">Tipo de Movimiento</label>
+        <select class="form-select" id="tipo_movimiento" name="tipo_movimiento" required>
+            <option value="1">Entrada</option>
+            <option value="2">Salida</option>
+        </select>
+    </div>
+    
+    <div class="mb-3">
+        <label for="cantidad" class="form-label">Cantidad</label>
+        <input type="number" class="form-control" id="cantidad" name="cantidad" required>
+    </div>
+    
+    <div class="mb-3">
+        <label for="fecha" class="form-label">Fecha</label>
+        <input type="date" class="form-control" id="fecha" name="fecha" required>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Agregar Movimiento</button>
+    <a href="/movimientos" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

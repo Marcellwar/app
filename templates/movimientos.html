@@ -1,0 +1,77 @@
+{% extends 'dashboard.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mt-4">Listado de Movimientos</h2>
+    
+    <!-- Cuadro de Búsqueda -->
+    <div class="input-group mb-3">
+        <input type="text" id="search" class="form-control" placeholder="Buscar por producto, tipo de movimiento o usuario">
+    </div>
+
+    <!-- Botón para Agregar Movimiento -->
+    <div class="mb-3">
+        <a href="/movimientos/agregar" class="btn btn-success">Agregar Movimiento</a>
+    </div>
+    
+    <!-- Botones de Exportación -->
+    <div class="mb-3">
+        <button class="btn btn-secondary" onclick="exportData('pdf')">Exportar a PDF</button>
+        <button class="btn btn-secondary" onclick="exportData('xlsx')">Exportar a XLSX</button>
+        <button class="btn btn-secondary" onclick="exportData('csv')">Exportar a CSV</button>
+        <button class="btn btn-secondary" onclick="exportData('xml')">Exportar a XML</button>
+        <button class="btn btn-secondary" onclick="exportData('json')">Exportar a JSON</button>
+    </div>
+
+    <!-- Tabla de Movimientos -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Producto</th>
+                <th>Usuario</th>
+                <th>Tipo de Movimiento</th>
+                <th>Cantidad</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="movementTable">
+            {% for movimiento in movimientos %}
+            <tr>
+                <td>{{ movimiento[0] }}</td>
+                <td>{{ movimiento[1] }}</td>
+                <td>{{ movimiento[2] }}</td>
+                <td>{{ 'Entrada' if movimiento[3] == 1 else 'Salida' }}</td>
+                <td>{{ movimiento[4] }}</td>
+                <td>{{ movimiento[5] }}</td>
+                <td>
+                    <a href="/movimientos/editar/{{ movimiento[0] }}" class="btn btn-warning" onclick="console.log('{{ movimiento[0] }}')">Editar</a>
+                    <a href="/movimientos/eliminar/{{ movimiento[0] }}" class="btn btn-danger">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Función para filtrar los movimientos
+    document.getElementById('search').addEventListener('keyup', function() {
+        let value = this.value.toLowerCase();
+        let rows = document.querySelectorAll('#movementTable tr');
+        
+        rows.forEach(row => {
+            let product = row.cells[1].textContent.toLowerCase();
+            let user = row.cells[2].textContent.toLowerCase(); // Para la búsqueda de usuario
+            let type = row.cells[3].textContent.toLowerCase();
+            row.style.display = (product.includes(value) || user.includes(value) || type.includes(value)) ? '' : 'none';
+        });
+    });
+
+    // Función para exportar los datos
+    function exportData(format) {
+        window.location.href = `/exportar/movimientos_/${format}`;
+    }
+</script>
+{% endblock %}
