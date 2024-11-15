@@ -19,4 +19,4 @@ spec:
         - containerPort: 5000
         env:
         - name: DATABASE_URL
-          value: "postgresql://inventario_tienda_user:DlOLdOjs1gqlTXKaCT2PsjVaBBeiaihn@dpg-cs3n4ct6l47c73da0pog-a.oregon-postgres.render.com/inventario_tienda"
+          value: "postgresql://inventario_tienda_nmtf_user:KALBPyBP8j9AYFaqTMhuWCrr3qnfQ9LG@dpg-csq312hu0jms73fmg2h0-a.oregon-postgres.render.com/inventario_tienda_nmtf"
